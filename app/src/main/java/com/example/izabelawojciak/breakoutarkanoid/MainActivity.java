@@ -1,6 +1,7 @@
 package com.example.izabelawojciak.breakoutarkanoid;
 
 import android.graphics.Point;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -42,6 +43,18 @@ public class MainActivity extends AppCompatActivity {
 
         gameThread.start();
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        gameView.sensorManager.registerListener(gameView, gameView.sensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        gameView.sensorManager.unregisterListener(gameView);
     }
 }
 

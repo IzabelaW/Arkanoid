@@ -83,6 +83,21 @@ public class Paddle extends ShapeDrawable {
 
     }
 
+    public void movePaddleByAccelerator(int distance){
+        paddle.left = paddle.left - (screenWidth/30 * distance);
+        paddle.right = paddle.right - (screenWidth/30 * distance);
+
+        if (paddle.left < 0){
+            paddle.left = 0;
+            paddle.right = paddleWidth * 2;
+        }
+
+        if (paddle.right > screenWidth){
+            paddle.right = screenWidth;
+            paddle.left = screenWidth - (paddleWidth * 2);
+        }
+    }
+
     public void drawPaddle(Canvas canvas, Context context){
         canvas.drawBitmap(bitmap, null, paddle, paint);
     }

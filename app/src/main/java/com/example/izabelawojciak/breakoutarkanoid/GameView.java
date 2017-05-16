@@ -47,10 +47,11 @@ public class GameView extends View implements SensorEventListener {
     private final int startTimer = 66;
     private final int frameRate = 33;
 
-    private Bitmap bitmap;
+    public Sensor sensor;
+    public SensorManager sensorManager;
 
-    private Sensor sensor;
-    private SensorManager sensorManager;
+    private float acceleratorDist;
+    private boolean acceleratorMoved;
 
     public GameView(Context context, int screenWidth, int screenHeight) {
         super(context);
@@ -60,7 +61,7 @@ public class GameView extends View implements SensorEventListener {
 
         sensorManager = (SensorManager)getContext().getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
+        sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
 
         paint = new Paint();
 
@@ -81,10 +82,8 @@ public class GameView extends View implements SensorEventListener {
         super.onDraw(canvas);
 
         drawToCanvas(canvas);
-        // Choose the brush color for drawing
         paint.setColor(Color.BLACK);
 
-        // Draw the score
         paint.setTextSize(60);
         paint.setFakeBoldText(true);
         canvas.drawText("Score: " + score, screenWidth - 300, screenHeight / 20, paint);
@@ -124,6 +123,7 @@ public class GameView extends View implements SensorEventListener {
     }
 
     private void createComponents(){
+
         paddle = new Paddle(screenWidth,screenHeight,getContext());
         ball = new Ball(screenWidth, screenHeight, getContext());
         bricks = new ArrayList<>();
@@ -194,6 +194,11 @@ public class GameView extends View implements SensorEventListener {
 
         if (touched) {
             paddle.movePaddle((int) touchedX);
+            touched = false;
+        }
+        else if (acceleratorMoved) {
+            paddle.movePaddleByAccelerator((int) acceleratorDist);
+            acceleratorMoved = false;
         }
     }
 
@@ -230,8 +235,11 @@ public class GameView extends View implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        touched = true;
-        touchedX = event.values[0];
+
+        float x = event.values[0];
+
+        acceleratorDist = x;
+        acceleratorMoved = true;
     }
 
     @Override
